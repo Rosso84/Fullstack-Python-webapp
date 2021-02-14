@@ -1,0 +1,62 @@
+{% extends 'layout.html' %}
+
+{#outputs on ´example navbar#}
+
+{% block body %}
+
+    <h1>Data for Deals</h1>
+    <br>
+
+    <table class="table table-striped ">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            {% for header in heads %}
+                <th scope="col">{{ header.name }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+
+
+        <tr>
+           {# <th scope="row">loop.index</th>#}
+            {% for deal in deals %}
+                <td>{{ deal.name }}</td>
+            {% endfor %}
+
+            {#  <td>{{ deal.get('num') }}</td>
+
+                <td>{{ deal.get('won') }}</td>
+
+                <td>{{ deal.get('stat') }}</td>#}
+        </tr>
+
+
+        </tbody>
+    </table>
+
+
+
+
+
+    {#
+            <tr>
+                {% if 'avg' in item %}
+                    <th scope="row">{{ item.avg }}</th>
+                {% endif %}
+            </tr>
+            <tr>
+                {% if 'won' in item %}
+                    <th scope="row">{{ item.won }}</th>
+                {% endif %}
+            </tr>
+             <tr>
+                {% if 'stat' in item %}
+                    <th scope="row">{{ item.stat }}</th>
+                {% endif %}
+            </tr>#}
+
+
+
+{% endblock %}
