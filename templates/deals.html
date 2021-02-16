@@ -4,13 +4,35 @@
 
 {% block body %}
 
-    <h1>Data for Deals</h1>
+
+    <h1>Data for deals previous year{#{{ previuosYear }}#}</h1>
+    <br>
+    <br>
     <br>
 
-    <table class="table table-striped ">
+    <h2>Average deal value won last year: {{ average }}</h2>
+    <h2>Number of won deals pr month last year: </h2>
+    <h2>Total value of won pr customer last year: </h2>
+
+    {#         <div class="speech_bubble" style="width: 150px; height: 150px; position: relative; left: 200px; background-color: chartreuse; text-align: center; ">Avg: </div>#}
+    {#         <div class="speech_bubble" style="width: 150px; height: 150px; position: relative; left: 500px; background-color: chartreuse; text-align: center">Avg: </div>#}
+    {#         <div class="speech_bubble" style="width: 150px; height: 150px; position: relative; left: 800px; background-color: chartreuse; text-align: center">Avg: </div>#}
+
+
+    {#<div class="div_avg_deals" style="height: 100px; width: 100px; background-color: blue; position: relative; float: right;">Avg: </div>#}
+    <br>
+
+
+    {#{% if deals %}#}
+
+
+
+
+
+    <table class="table table-striped " style=" position: relative; top: 100px;">
         <thead>
         <tr>
-            <th scope="col">#</th>
+            {#  <th scope="col">#</th>#}
             {% for header in heads %}
                 <th scope="col">{{ header.name }}</th>
             {% endfor %}
@@ -18,29 +40,25 @@
         </thead>
         <tbody>
 
+        {% for deal in deals %}
+            <tr>
+                <th scope="row">loop.index</th>
 
-        <tr>
-           {# <th scope="row">loop.index</th>#}
-            {% for deal in deals %}
-                <td>{{ deal.name }}</td>
-            {% endfor %}
+                {% for data in deal %}
+                    <td>{{ data }}</td>
+                {% endfor %}
 
-            {#  <td>{{ deal.get('num') }}</td>
+
+
+                {#  <td>{{ deal.get('num') }}</td>
 
                 <td>{{ deal.get('won') }}</td>
 
                 <td>{{ deal.get('stat') }}</td>#}
-        </tr>
+            </tr>
+        {% endfor %}
 
-
-        </tbody>
-    </table>
-
-
-
-
-
-    {#
+        {#
             <tr>
                 {% if 'avg' in item %}
                     <th scope="row">{{ item.avg }}</th>
@@ -56,6 +74,16 @@
                     <th scope="row">{{ item.stat }}</th>
                 {% endif %}
             </tr>#}
+
+        </tbody>
+    </table>
+
+    {#  {% else %}
+
+
+            <H1 style="color: blueviolet">{{ msg }}</H1>
+
+        {% endif %}#}
 
 
 
