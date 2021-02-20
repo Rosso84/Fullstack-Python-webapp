@@ -1,52 +1,7 @@
-/*.speech_bubble {
-    position: relative;
-    background: #FFFFCC;
-    border: 1px solid #FFCC00;
-    max-width: 250px;
-    padding: 10px;
-    font-family: arial;
-    margin: 0 auto;
-    font-size: 14px;
-    border-radius: 6px;
-}
-
-.speech_bubble:after,
-.speech_bubble:before {
-    right: 100%;
-    top: 50%;
-    border: solid transparent;
-    content: " ";
-    height: 0;
-    width: 0;
+/*.body {
     position: absolute;
-    pointer-events: none;
-}
-
-.speech_bubble:after {
-    border-color: rgba(255, 255, 204, 0);
-    border-right-color: #FFFFCC;
-    border-width: 15px;
-    margin-top: -15px;
-}
-.speech_bubble:before {
-    border-color: rgba(255, 204, 0, 0);
-    border-right-color: #FFCC00;
-    border-width: 16px;
-    margin-top: -16px;
+    width:100%;
+    height: 100%;
+    background-image: url("images/colorfull.jpg");
 }*/
 
-/*
-.speech_bubble {
-    width: 150px;
-    height: 150px;
-    background-color: blue;
-    position: relative;
-    float: left;
-    border-left: 10px solid #00bfb6;
-    border-right: 10px solid transparent;
-    border-top: 10px solid #00bfb6;
-    border-bottom: 10px solid transparent;
-    right: -20px;
-    top: 6px;
-    text-align: center;
-}*/

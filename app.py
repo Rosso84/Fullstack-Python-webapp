@@ -1,11 +1,12 @@
+from datetime import *
 from flask import Flask, render_template
-from datetime import *;
-from dateutil.relativedelta import *
-import calendar
 import requests
 import json
+from API import deals_api
+from API import companies_api
 
 # Feel free to import additional libraries if you like
+
 
 app = Flask(__name__, static_url_path='/static')
 
@@ -13,40 +14,10 @@ app = Flask(__name__, static_url_path='/static')
 headers = {
     "Content-Type": "application/json",
     "Accept": "application/hal+json",
-    "x-api-key": ""
+    "x-api-key": "860393E332148661C34F8579297ACB000E15F770AC4BD945D5FD745867F590061CAE9599A99075210572"
 }
 
-""" Calculate total average deal values for previous year """
-def calculate_average_deals_previuos_year(lime_object):
-    values = []
 
-    for data in lime_object:
-        value = data['value']
-
-        # If e.g "_timestamp" is the data that provides information of the year the  limeobject "deals"
-        timestamp = data['_timestamp']
-        convertedDateOfDeal = datetime.fromisoformat(timestamp).date()
-        dealYear = convertedDateOfDeal.year
-        thisYear = datetime.now().year
-        previuosYear = thisYear - 1
-
-        # If the deals year is previous, add value to list
-        if dealYear == previuosYear:
-            values.append(value)
-
-        # Calculate total average
-    valuesLength = len(values)
-    sumValues = sum(values)
-    averageTotalValuesPreviousYear = sumValues / valuesLength
-
-    # Convert to a whole number
-    convertedValue = int(averageTotalValuesPreviousYear)
-    print('Average: ', convertedValue)
-
-    return convertedValue
-
-
-# Example of function for REST API call to get data from Lime
 def get_api_data(headers, url):
     # First call to get first data page from the API
     response = requests.get(url=url,
@@ -56,7 +27,9 @@ def get_api_data(headers, url):
 
     # Convert response string into json data and get embedded limeobjects
     json_data = json.loads(response.text)
+    print(type(json_data))
     limeobjects = json_data.get("_embedded").get("limeobjects")
+    print(type(limeobjects))
 
     # Check for more data pages and get those too
     nextpage = json_data.get("_links").get("next")
@@ -81,103 +54,79 @@ def index():
 
 
 @app.route('/deals')
-def example():
-    # Example of API call to get deals
-    base_url = "https://api-test.lime-crm.com/api-test/api/v1/limeobject/deal/"
-    params = "?_limit=50"
+def deals():
+    companies = "company/"
+    deal = "deal/"
+    limit = "?_limit=10"
+    offset = "&_offset=10"
 
-    url = base_url + params
-    response_deals = get_api_data(headers=headers, url=url)
+    base_url = "https://api-test.lime-crm.com/api-test/api/v1/limeobject/"
+    deals_url = base_url + deal + limit
+    next_deals_url = deals_url + limit + offset
+
+    company_url = base_url + companies + limit
+
+    response_deals = get_api_data(headers=headers, url=deals_url)
+    #next_deal = get_api_data(headers=headers, url=next_url)
+
+    response_companies = get_api_data(headers=headers, url=company_url)
 
 
+    average_values_total_year = \
+        deals_api.get_average_deal_values_won_last_year( response_deals )
 
-    """ Calculate number of won deals pr month last year  """
+    total_values_previous_year = \
+        deals_api.get_total_values_won_last_year( response_deals )
 
-    dealsPrMonth = {
-        'january': 0,
-        'february': 0,
-        'march': 0,
-        'april': 0,
-        'may': 0,
-        'june': 0,
-        'july': 0,
-        'august': 0,
-        'september': 0,
-        'october': 0,
-        'november': 0,
-        'december': 0
-    }
+    deals_pr_month = \
+        deals_api.get_list_of_won_deals_pr_month_last_year( response_deals )
 
-    valuesDealsPrMonth = dealsPrMonth.values()
+    average_deals_pr_month = \
+        deals_api.get_average_number_of_won_deals_pr_month_last_year( response_deals )
 
-    for key, value in dealsPrMonth.items():
-        print(key, value)
+    total_number_of_deals_won = \
+        deals_api.get_total_number_of_won_deals_last_Year( response_deals )
 
-    # Avarage
-    # letters = {'a': 2, 'b': 4, 'c': 6, 'd': 9, 'a': 20}
-    #
-    # for x in letters:
-    #     print(letters[x])
-    #
-    # values = letters.values()
-    #
-    # total = sum(values)
+    customer_and_values = \
+        deals_api.get_list_of_values_won_pr_customer_last_year( response_deals )
 
-    # average = total / len(letters)
+    current_company_status_list = \
+        companies_api.get_all_current_company_status_list(response_companies)
 
-    # print(average)
+    # updated_company_status = \
+    #     deals_api.get_updated_company_status( response_deals, current_company_status_list )
 
-    # data = (('Franky hansen', '6 ', '9', '12', 'prospekt'),
-    #         ('Timmy hansen', '6 ', '9', '12', 'not_interested'),
-    #         ('Timmy hansen', '6 ', '9', '12', 'not_interested'),
-    #         ('Timmy hansen', '6 ', '9', '12', 'not_interested'),
-    #         ('Timmy hansen', '6 ', '9', '12', 'not_interested'),
-    #         ('Timmy hansen', '6 ', '9', '12', 'not_interested'),
-    #         ('Jhon hansen', '0 ', '0', '0', 'Inactive'))
+    thisYear = datetime.now().year
+    last_year = thisYear - 1
 
-    payload = [{"name": "Tom hansen"}, {"name": "5"}, {"name": "10"}, {"name": "11"}, {"name": "customer"},
-               {'name': 'Franky hansen'}, {'name': '6 '}, {'name': '9'}, {'name': '12'}, {'name': 'prospekt'},
-               {'name': 'Timmy hansen'}, {'name': '7 '}, {'name': '10'}, {'name': '13'}, {'name': 'inactive'}]
-
-    # payload = [{"name": "Tom hansen"}, {'name': 'Franky hansen'}, {'name': 'Timmy hansen'},
-    #            {"avg": "5"}, {'avg': '6 '}, {'avg': '7 '},
-    #            {'num': '10'}, {"num": "10"}, {'num': '9'},
-    #            {'stat': 'prospekt'}, {"stat": "customer"}, {'stat': 'inactive'},
-    #            {'won': '12'}, {"won": "11"}, {'won': '13'}]
-
-    # count keys occurences for ids
-    sumNumberofName = len([k for d in payload for k in d.keys() if k == 'name'])  # should be 3
-    # print(sumLettersOfA, '-----number of keys -----')
-
-    # second version of count
-    keys_list = []
-    for data in payload:
-        keys_list += data.keys()
-    x = keys_list.count('name')
-    # print(keys_list, '-----number of keys -----')
-
-    table_headers = [{'name': 'Companies'}, {'name': 'Status'}]
-
-    average = calculate_average_deals_previuos_year(response_deals)
-
-    if len(data) > 0:
-        return render_template('deals.html', deals=data, heads=table_headers, average=average)
+    if len(response_deals) > 0:
+        return render_template('deals.html',
+                               average_total_year=average_values_total_year,
+                               total_value_pr_customer_previous_year=total_values_previous_year,
+                               deals_pr_month=deals_pr_month,
+                               average_deals_pr_month=average_deals_pr_month,
+                               total_pr_customer=total_number_of_deals_won,
+                               customer_and_values=customer_and_values,
+                               #updated_company_status=updated_company_status,
+                               #next_url=next_deal,
+                               year=last_year)
     else:
         msg = 'No deals found'
         return render_template('deals.html', msg=msg)
 
 
 # You can add more pages to your app, like this:
-@app.route('/myroute')
-def myroute():
-    fruits = [{"fruit": "Banana"}, {"fruit": "Banana"}, {"fruit": "Banana"}, {"fruit": "Banana"}]
+@app.route('/companies')
+def company():
 
-    """
-    For myroute.html to render you have to create the myroute.html
-    page inside the templates-folder. And then add a link to your page in the
-    _navbar.html-file, located in templates/includes/
-    """
-    return render_template('myroute.html', deals=fruits)
+    response_companies = {}
+
+    if len(response_companies) > 0:
+        return render_template('companies.html',
+                               )
+    else:
+        msg = 'No companies found'
+        return render_template('companies.html', msg=msg)
 
 
 # DEBUGGING
@@ -191,4 +140,3 @@ your application
 if __name__ == '__main__':
     app.secret_key = 'somethingsecret'
     app.run(debug=True)
-

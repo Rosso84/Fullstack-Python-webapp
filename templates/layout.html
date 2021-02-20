@@ -6,12 +6,12 @@
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
         <link rel="stylesheet" href="/static/style.css">
 	</head>
-	<body>
+	<body style="position: relative; background-image: url('../static/images/purple.png'); width: 100%; height: 100%;">
 		<div class="container">
 		{% include 'includes/_navbar.html' %}
 		</div>
 
-		<div class="container" style="padding-top: 10px;" >
+		<div class="container" style="padding-top: 10px; " >
 			{% include 'includes/_messages.html' %}
 			{% block body %}{% endblock %}
 		</div>
