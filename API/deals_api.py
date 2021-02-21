@@ -1,5 +1,4 @@
 from datetime import *
-from API import companies_api
 
 counter = 0
 thisYear = datetime.now().year
@@ -61,9 +60,7 @@ def get_list_of_values_won_pr_customer_last_year(lime_object_deals):
 # Calculates and returns sum of total values for previous year
 def get_total_values_won_last_year(lime_object_deals):
     list_of_values = get_list_of_all_won_deal_values_last_year(lime_object_deals)
-
     total = sum(list_of_values)
-
     return total
 
 
@@ -165,83 +162,109 @@ def get_total_number_of_won_deals_last_Year(lime_object_deals):
 # Receives data closeddate and key from a lime_object 'deal'.
 # Returns a boolean value true if lime_object deal is a won deal and if the deal is from last year.
 def is_agreement_last_year(closed_date, deal_status_key):
-    global deal_year
-    if isinstance(closed_date, str):
-        date_object = datetime.fromisoformat(closed_date).date()
-        deal_year = date_object.year
-        print('from is_agreement_last_year inside if statement:', deal_year)
-
-    return deal_status_key == 'agreement' and deal_year == last_year
+    deal_year = get_deal_year(closed_date)
+    return is_agreement(deal_status_key) and deal_year == last_year
 
 
 # Receives data closeddate, deal_status:key from a lime_object 'deal'.
 # Returns true if lime_object deal is a won deal and if the deal is before last year.
 def is_agreement_in_past(closed_date, deal_status_key):
-    deal_year = None
-    if closed_date is not None or not closed_date:
-        date_object = datetime.fromisoformat(closed_date).date()
-        deal_year = date_object.year
-        print('from is_agreement_in_past: ', deal_year)
-
-    return deal_status_key == 'agreement' and deal_year < last_year
+    deal_year = get_deal_year(closed_date)
+    return is_agreement(deal_status_key) and deal_year < last_year
 
 
 # Receives data closeddate, deal_status:key from a lime_object 'deal'.
 # Returns true if lime_object deal is a won deal and if the deal is this year.
 def is_agreement_this_year(closed_date, deal_status_key):
+    deal_year = get_deal_year(closed_date)
+    return is_agreement(deal_status_key) and deal_year == thisYear
+
+
+def is_agreement(deal_status_key):
+    return deal_status_key == 'agreement'
+
+
+def get_deal_year(closed_date):
     global deal_year
-    if closed_date is not None or not closed_date:
+    if isinstance(closed_date, str):
         date_object = datetime.fromisoformat(closed_date).date()
         deal_year = date_object.year
-        print('from is_agreement_this_year: ', deal_year)
-    return deal_status_key == 'agreement' and deal_year == thisYear
+    return deal_year
 
 
-#
-# def get_deal_year(deal_date):
-#     # Convert date and extract year
-#     deal_year = 0
-#     if deal_date == None or not deal_date:
-#         date_object = datetime.fromisoformat(deal_date.date())
-#         deal_year = date_object.year
-#         print('from get_dealYear: ', deal_year)
-#     return deal_year
+# Receives
+# Returns a list of status only of customers that HAS registered deals. If no deal is found,
+# status will be set to -no deals found-
+def get_updated_company_status(lime_object_deals, limeobject_customer_status_list):
+    status_customer = "customer"
+    status_not_found = "deal not found"
+    status_inactive = 'inactive'
+    status_prospect = "prospect"
+    status_not_interested = 'notinterested'
+    status_active = 'active'
+    customer_status_list = limeobject_customer_status_list
 
-
-def get_updated_company_status(lime_object_deals, current_status_list):
-    status_list = current_status_list
-
-    # extract each data from the lime object
+    # extract each data we need from the 'Deal' lime_object and update them
     for deal in lime_object_deals:
-        deal_status_key = deal['dealstatus']['key']  # 'agreement'
-        company = deal['company']
-        value = deal['value']
-        closed_date = deal['closeddate']  # When the deal was ended
 
-        # If company is null or empty string set value to '-Id missing-'
-        # if company == None or not company:
-        #     company = "-Id missing-"
+        # 'status: key' is either agreement' or other
+        deal_status_key = deal['dealstatus']['key']
+        # assuming data 'company' is the name of the company
+        company = deal['company']
+        # date the deal was ended
+        closed_date = deal['closeddate']
+
+        print('agreement?: ', deal_status_key)
+        print('company?: ', company)
+        print('date?: ', closed_date)
+
+        # if company is null or empty string
+        if company is None or not company:
+            company = 'deal missing id'
+
+        # Some of the date values was None or not string.
+        # if date is null or set as 'null' or not a string or empty string, set a date with year 1111
+        # This will allow convertion of date in is_agreements. Might need to change if
+        if not isinstance(closed_date, str) or closed_date is None or not closed_date or 'null':
+            closed_date = '1111-02-22T00:00:00+01:00'
+            print('Date was not a valid date and set to default date: ', closed_date)
 
         # if the lime object deal was won any date then set status as 'customer'
-        if deal_status_key == 'agreement':
-            status = "Customer"
-            status_list[company] = status
-            return
+        if is_agreement(deal_status_key):
+            customer_status_list[company] = status_customer
 
-        # if company has bought something in past, but not last year set status to 'inactive'
-        elif not is_agreement_last_year(closed_date, deal_status_key) and is_agreement_in_past(closed_date,
-                                                                                               deal_status_key):
-            status = 'inactive'
-            status_list[company] = status
+        # if company has bought something in past, but not last year set status to 'inactive'.
+        # Note: spaces in parentheses must stay tis way, otherwise it will fail
+        elif (
+                not is_agreement_last_year(closed_date, deal_status_key)
+                and not is_agreement_this_year(closed_date, deal_status_key)
+                and is_agreement_in_past(closed_date, deal_status_key)
+        ):
+            customer_status_list[company] = status_inactive
 
         # If never bought anything set to status to "prospekt" unless it has buying status "notinterested"
         elif (
-                not is_agreement_last_year(closed_date, deal_status_key) == False
-                and is_agreement_in_past(closed_date, deal_status_key) == False
-                and is_agreement_this_year(closed_date, deal_status_key) == False
-                and status_list[company] is not 'notinterested'
+                is_agreement_last_year(closed_date, deal_status_key)
+                and not is_agreement_in_past(closed_date, deal_status_key)
+                and not is_agreement_this_year(closed_date, deal_status_key)
+                and customer_status_list[company] is not status_not_interested
         ):
-            status = "prospekt"
-            status_list[company] = status
+            customer_status_list[company] = status_prospect
 
-    return status_list
+    # Change existing status from previous fetched data from lime_object 'customer'
+    # that does not match any deals to -deal not found- unless it is active.
+    # If buying_status is 'active' set to customer.
+    for company_name, buying_status in customer_status_list.items():
+        if buying_status == status_active:
+            customer_status_list[company_name] = status_customer
+        # some registered buying status in lime_object 'Customer' was set to number such as '108001'
+        # and are not associated to any company names in limeobject Deals. These statuses will be set to 'no deals found'
+        # elif buying_status != status_active or buying_status != status_prospect or buying_status != status_customer or buying_status != status_not_interested:
+        #     customer_status_list[company_name] = status_not_found
+
+    return customer_status_list
+
+
+def deal_exists(deal_name, company_list):
+    for company_name, buying_status in company_list.items():
+        return company_name == deal_name

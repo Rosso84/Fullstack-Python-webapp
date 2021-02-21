@@ -91,10 +91,16 @@ def deals():
         deals_api.get_list_of_values_won_pr_customer_last_year( response_deals )
 
     current_company_status_list = \
-        companies_api.get_all_current_company_status_list(response_companies)
+        companies_api.get_all_current_company_status_list( response_companies )
 
-    # updated_company_status = \
-    #     deals_api.get_updated_company_status( response_deals, current_company_status_list )
+    updated_company_status = \
+         deals_api.get_updated_company_status( response_deals,
+                                                current_company_status_list )
+
+
+
+    if updated_company_status is None:
+        updated_company_status = {"Empty": "Empty"}
 
     thisYear = datetime.now().year
     last_year = thisYear - 1
@@ -107,7 +113,7 @@ def deals():
                                average_deals_pr_month=average_deals_pr_month,
                                total_pr_customer=total_number_of_deals_won,
                                customer_and_values=customer_and_values,
-                               #updated_company_status=updated_company_status,
+                               updated_company_status=updated_company_status,
                                #next_url=next_deal,
                                year=last_year)
     else:
