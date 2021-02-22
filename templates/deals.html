@@ -24,9 +24,6 @@
         <div class="col col-md-1">
             <p>Won_deals</p>
         </div>
-      {#  <div class="col col-md-1">
-            <p>#</p>
-        </div>#}
         <div class="col col-md-2">
             <p>Company</p>
         </div>
@@ -38,19 +35,18 @@
         </div>
     </div>
 
-      {#********* Comany status**********#}
+    {#********* Comany status**********#}
 
-</div>
     <div class="table_div"
          style="position: absolute; width: 397px; left: 245px; top: 208px; height: 300px; overflow: auto;">
 
         <table class="table table-bordered table-striped mb-0  table-success">
             <tbody>
-            {% for k, v in updated_company_status.items() %}
+            {% for company, status in updated_company_status.items() %}
                 <tr>
                     <td>{{ loop.index }}</td>
-                    <td>{{ k }}</td>
-                    <td>{{ v }}</td>
+                    <td>{{ company }}</td>
+                    <td>{{ status }}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -60,34 +56,26 @@
 
     {#********* Won deals pr mont**********#}
 
-    <div style=" width: 185px; height: 300px; position:absolute; top: 208px; left: 644px; overflow: auto">
+    <div style=" width: 185px; height: 300px; position:absolute; top: 208px; left: 643px; overflow: auto">
 
         <table class="table table-striped table-sm table-danger" style="width: 185px; position: relative;">
             <tbody>
-            {% for key, value in deals_pr_month.items() %}
+            {% for month, deals in deals_pr_month.items() %}
                 <tr>
-                    <td>{{ key }}</td>
-                    <td>{{ value }}</td>
+                    <td>{{ month }}</td>
+                    <td>{{ deals }}</td>
                 </tr>
             {% endfor %}
-            <tr class="table-primary">
-                <td>Total:</td>
-                <td>{{ total_pr_customer }}</td>
-            </tr>
-            <tr class="table-success">
-                <td>Average:</td>
-                <td>{{ average_deals_pr_month }}</td>
-            </tr>
             </tbody>
         </table>
 
     </div>
 
-      {#********* Won deals pr mont**********#}
-    <div style=" width: 560px; height: 300px; position:absolute; top: 208px; left: 828px; overflow: auto;">
-        {# <h6 style=" position: relative; text-align: center">Won deals pr customer</h6>#}
+    {#********* Values per customer  **********#}
+
+    <div style=" width: 560px; height: 300px; position:absolute; top: 208px; left:826px; overflow: auto;">
         <table class="table table-striped table-sm table-warning border border-success"
-               style="width: 560px; position: relative;">
+               style="width: 565px; position: relative;">
             <tbody>
             {% for items in customer_and_values %}
                 <tr>
@@ -97,20 +85,41 @@
                     {% endfor %}
                 </tr>
             {% endfor %}
-            <tr class="table-primary">
-                <td>Tot:</td>
-                <td>{{ total_value_pr_customer_previous_year }}</td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr class="table-success">
-                <td>Avr:</td>
-                <td>{{ average_total_year }}</td>
-                <td></td>
-                <td></td>
-            </tr>
             </tbody>
         </table>
+
+
     </div>
+{#
+    <div style="background-color: darkgray; position: relative; top: 350px; width: 150px; height: 100px; left: 380px; text-align: center; border-radius: 25px; ">
+        <p style="position: relative; margin: auto">Total deals: {{ total_deals }}</p>
+        <p>Average deals:{{ average_deals }}</p>
+    </div>#}
+
+    <ul class="list-group" style="position:relative; top: 350px;">
+        <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-danger">
+            Total Deals:
+            <span class="badge badge-primary badge-pill">{{ total_deals }}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-danger">
+            Average deals:
+            <span class="badge badge-primary badge-pill">{{ average_deals }}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-warning">
+            Total Values:
+            <span class="badge badge-primary badge-pill">{{ total_values }}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-warning">
+            Average Values:
+            <span class="badge badge-primary badge-pill">{{ average_values }}</span>
+        </li>
+
+    </ul>
+    {# <div style="background-color: darkgray; position: relative; top: 350px; width: 150px; height: 100px; left: 480px; text-align: center; border-radius: 25px; ">
+        <p style="position: relative; margin: auto">Total values: {{ total_values }}</p>
+        <p>Average values:{{ average_values }}</p>
+    </div>#}
+
+
 
 {% endblock %}

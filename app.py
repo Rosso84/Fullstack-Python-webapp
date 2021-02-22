@@ -14,7 +14,7 @@ app = Flask(__name__, static_url_path='/static')
 headers = {
     "Content-Type": "application/json",
     "Accept": "application/hal+json",
-    "x-api-key": "860393E332148661C34F8579297ACB000E15F770AC4BD945D5FD745867F590061CAE9599A99075210572"
+    "x-api-key": ""
 }
 
 
@@ -72,7 +72,7 @@ def deals():
     response_companies = get_api_data(headers=headers, url=company_url)
 
 
-    average_values_total_year = \
+    average_values = \
         deals_api.get_average_deal_values_won_last_year( response_deals )
 
     total_values_previous_year = \
@@ -81,7 +81,7 @@ def deals():
     deals_pr_month = \
         deals_api.get_list_of_won_deals_pr_month_last_year( response_deals )
 
-    average_deals_pr_month = \
+    average_deals = \
         deals_api.get_average_number_of_won_deals_pr_month_last_year( response_deals )
 
     total_number_of_deals_won = \
@@ -107,11 +107,11 @@ def deals():
 
     if len(response_deals) > 0:
         return render_template('deals.html',
-                               average_total_year=average_values_total_year,
-                               total_value_pr_customer_previous_year=total_values_previous_year,
+                               average_values=average_values,
+                               total_values=total_values_previous_year,
                                deals_pr_month=deals_pr_month,
-                               average_deals_pr_month=average_deals_pr_month,
-                               total_pr_customer=total_number_of_deals_won,
+                               average_deals=average_deals,
+                               total_deals=total_number_of_deals_won,
                                customer_and_values=customer_and_values,
                                updated_company_status=updated_company_status,
                                #next_url=next_deal,
